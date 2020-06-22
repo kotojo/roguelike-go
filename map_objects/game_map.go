@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"time"
 
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/kotojo/roguelike_go/entity"
 )
 
@@ -37,7 +38,16 @@ func (g *GameMap) initializeTiles() {
 	g.Tiles = tiles
 }
 
-func (g *GameMap) MakeMap(maxRooms, roomMinSize, roomMaxSize, mapWidth, mapHeight int, player *entity.Entity) {
+func (g *GameMap) MakeMap(
+	maxRooms,
+	roomMinSize,
+	roomMaxSize,
+	mapWidth,
+	mapHeight int,
+	player *entity.Entity,
+	entities *[]*entity.Entity,
+	maxMonstersPerRoom int,
+) {
 	rooms := []*Rect{}
 	numRooms := 0
 
@@ -81,6 +91,7 @@ func (g *GameMap) MakeMap(maxRooms, roomMinSize, roomMaxSize, mapWidth, mapHeigh
 				g.createHTunnel(prevX, newX, prevY)
 			}
 		}
+		g.placeEntities(newRoom, entities, maxMonstersPerRoom)
 		rooms = append(rooms, newRoom)
 		numRooms++
 	}
@@ -118,6 +129,45 @@ func (g *GameMap) createVTunnel(y1, y2, x int) {
 	for y := minY; y < maxY; y++ {
 		g.Tiles[x][y].Blocked = false
 		g.Tiles[x][y].BlockSight = false
+	}
+}
+
+func (g *GameMap) placeEntities(room *Rect, entities *[]*entity.Entity, maxMonstersPerRoom int) {
+	numOfMonsters := rand.Intn(maxMonstersPerRoom)
+	for i := 0; i < numOfMonsters; i++ {
+		minX := room.X1 + 1
+		maxX := room.X2 - 1
+		x := rand.Intn(maxX-minX) + minX
+		minY := room.Y1 + 1
+		maxY := room.Y2 - 1
+		y := rand.Intn(maxY-minY) + minY
+		entityInLoc := false
+		for j := 0; j < len(*entities); j++ {
+			entity := (*entities)[j]
+			if entity.X == x && entity.Y == y {
+				entityInLoc = true
+				break
+			}
+		}
+		if !entityInLoc {
+			var monster *entity.Entity
+			if rand.Intn(100) < 80 {
+				monster = &entity.Entity{
+					X:     x,
+					Y:     y,
+					Char:  "o",
+					Color: rl.Green,
+				}
+			} else {
+				monster = &entity.Entity{
+					X:     x,
+					Y:     y,
+					Char:  "T",
+					Color: rl.DarkGreen,
+				}
+			}
+			*entities = append(*entities, monster)
+		}
 	}
 }
 

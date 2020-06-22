@@ -8,6 +8,7 @@ import (
 
 const BlockSize = 16
 const FovRadius = 10
+const MaxMonstersPerRoom = 3
 
 func main() {
 	var screenWidth int32 = 80 * BlockSize
@@ -34,20 +35,12 @@ func main() {
 		Color: rl.White,
 	}
 
-	npc := &entity.Entity{
-		X:     int(mapWidth)/2 - 3,
-		Y:     int(mapHeight) / 2,
-		Char:  "@",
-		Color: rl.Brown,
-	}
-
 	entities := []*entity.Entity{
 		player,
-		npc,
 	}
 
 	gameMap := map_objects.NewGameMap(mapWidth, mapHeight)
-	gameMap.MakeMap(maxRooms, roomMinSize, roomMaxSize, mapWidth, mapHeight, player)
+	gameMap.MakeMap(maxRooms, roomMinSize, roomMaxSize, mapWidth, mapHeight, player, &entities, MaxMonstersPerRoom)
 
 	canFullscreen := true
 	canMove := true
