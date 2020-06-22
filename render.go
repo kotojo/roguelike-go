@@ -23,14 +23,15 @@ func renderAll(font rl.Font, entities []*entity.Entity, gameMap *map_objects.Gam
 				X: BlockSize,
 				Y: BlockSize,
 			}
-			var color rl.Color
+			color := rl.Black
 			if visible {
 				if wall {
 					color = rl.Brown
 				} else {
 					color = rl.Gold
 				}
-			} else {
+				tile.Explored = true
+			} else if tile.Explored {
 				if wall {
 					color = rl.DarkBlue
 				} else {
