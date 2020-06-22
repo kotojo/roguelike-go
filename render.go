@@ -41,22 +41,24 @@ func renderAll(font rl.Font, entities []*entity.Entity, gameMap *map_objects.Gam
 		}
 	}
 	for _, entity := range entities {
-		drawEntity(font, entity)
+		drawEntity(font, entity, gameMap)
 	}
 }
 
-func drawEntity(font rl.Font, entity *entity.Entity) {
-	rl.DrawTextRec(
-		font,
-		entity.Char,
-		rl.Rectangle{
-			X:      float32(entity.X) * BlockSize,
-			Y:      float32(entity.Y) * BlockSize,
-			Width:  BlockSize,
-			Height: BlockSize,
-		},
-		BlockSize,
-		0,
-		false,
-		entity.Color)
+func drawEntity(font rl.Font, entity *entity.Entity, gameMap *map_objects.GameMap) {
+	if gameMap.MapIsInFov(entity.X, entity.Y) {
+		rl.DrawTextRec(
+			font,
+			entity.Char,
+			rl.Rectangle{
+				X:      float32(entity.X) * BlockSize,
+				Y:      float32(entity.Y) * BlockSize,
+				Width:  BlockSize,
+				Height: BlockSize,
+			},
+			BlockSize,
+			0,
+			false,
+			entity.Color)
+	}
 }
