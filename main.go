@@ -2,11 +2,12 @@ package main
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/kotojo/roguelike/entity"
-	"github.com/kotojo/roguelike/map_objects"
+	"github.com/kotojo/roguelike_go/entity"
+	"github.com/kotojo/roguelike_go/map_objects"
 )
 
 const BlockSize = 16
+const FovRadius = 10
 
 func main() {
 	var screenWidth int32 = 80 * BlockSize
@@ -50,6 +51,7 @@ func main() {
 
 	canFullscreen := true
 	canMove := true
+	fovRecompute := true
 
 	for !rl.WindowShouldClose() {
 		// Movement
@@ -75,13 +77,20 @@ func main() {
 				)
 			}
 			canMove = false
+			fovRecompute = true
+		}
+
+		if fovRecompute {
+			gameMap.RecomputeFov(player.X, player.Y, FovRadius)
 		}
 
 		// Draw
 		rl.BeginDrawing()
 
 		rl.ClearBackground(rl.RayWhite)
+
 		renderAll(pixelFont, entities, gameMap)
+		fovRecompute = false
 
 		rl.EndDrawing()
 	}

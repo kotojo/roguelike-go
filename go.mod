@@ -1,4 +1,4 @@
-module github.com/kotojo/roguelike
+module github.com/kotojo/roguelike_go
 
 go 1.14
 

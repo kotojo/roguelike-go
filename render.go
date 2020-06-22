@@ -2,14 +2,15 @@ package main
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/kotojo/roguelike/entity"
-	"github.com/kotojo/roguelike/map_objects"
+	"github.com/kotojo/roguelike_go/entity"
+	"github.com/kotojo/roguelike_go/map_objects"
 )
 
 func renderAll(font rl.Font, entities []*entity.Entity, gameMap *map_objects.GameMap) {
 	for y := 0; y < gameMap.Height; y++ {
 		for x := 0; x < gameMap.Width; x++ {
 			tile := gameMap.Tiles[x][y]
+			visible := gameMap.MapIsInFov(x, y)
 			wall := false
 			if tile != nil && tile.Blocked {
 				wall = true
@@ -22,9 +23,19 @@ func renderAll(font rl.Font, entities []*entity.Entity, gameMap *map_objects.Gam
 				X: BlockSize,
 				Y: BlockSize,
 			}
-			color := rl.DarkBlue
-			if wall {
-				color = rl.Blue
+			var color rl.Color
+			if visible {
+				if wall {
+					color = rl.Brown
+				} else {
+					color = rl.Gold
+				}
+			} else {
+				if wall {
+					color = rl.DarkBlue
+				} else {
+					color = rl.Blue
+				}
 			}
 			rl.DrawRectangleV(blockLoc, blockSize, color)
 		}

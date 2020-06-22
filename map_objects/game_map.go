@@ -1,10 +1,11 @@
 package map_objects
 
 import (
+	"math"
 	"math/rand"
 	"time"
 
-	"github.com/kotojo/roguelike/entity"
+	"github.com/kotojo/roguelike_go/entity"
 )
 
 type GameMap struct {
@@ -126,4 +127,52 @@ func (g *GameMap) IsPlayerBlocked(x, y int) bool {
 	}
 	tile := g.Tiles[x][y]
 	return tile.Blocked
+}
+
+// RecomputeFov sets the Viewable property for each
+// tile based on the radius for fov provided.
+func (g *GameMap) RecomputeFov(centerX, centerY, radius int) {
+	// We start by getting the area of the map to iterate through
+	// as a square with (radius * 2) + 1 width and height.
+	// The addition +/- 1 is to make sure we set the tiles viewable
+	// on the last player movement back to false since they would have
+	// just moved 1 square to trigger this recalculation
+	startingX := centerX - radius - 1
+	endingX := centerX + radius + 1
+	startingY := centerY - radius - 1
+	endingY := centerY + radius + 1
+	floatCenterX := float64(centerX)
+	floatCenterY := float64(centerY)
+	floatRadius := float64(radius)
+	for x := startingX; x <= endingX; x++ {
+		if x < 0 || x >= len(g.Tiles) {
+			continue
+		}
+		row := g.Tiles[x]
+		for y := startingY; y <= endingY; y++ {
+			// Check if the tile is within viewing distance,
+			// and set `tile.Viewable`
+			if y < 0 || y >= len(row) {
+				continue
+			}
+			tile := row[y]
+			if math.Sqrt(math.Pow(float64(x)-floatCenterX, 2)+math.Pow(float64(y)-floatCenterY, 2)) > floatRadius {
+				tile.Viewable = false
+			} else {
+				tile.Viewable = true
+			}
+		}
+	}
+}
+
+func (g *GameMap) MapIsInFov(x, y int) bool {
+	row := g.Tiles[x]
+	if row == nil {
+		return false
+	}
+	tile := row[y]
+	if tile == nil {
+		return false
+	}
+	return tile.Viewable
 }
