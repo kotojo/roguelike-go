@@ -46,25 +46,20 @@ func main() {
 	gameMap := map_objects.NewGameMap(mapWidth, mapHeight)
 	gameMap.MakeMap(maxRooms, roomMinSize, roomMaxSize, mapWidth, mapHeight, player, &entities, MaxMonstersPerRoom)
 
-	canFullscreen := true
-	canMove := true
 	fovRecompute := true
 
+	gameState := PlayersTurn
 	for !rl.WindowShouldClose() {
 		// Movement
 		action := handleKeys()
 
-		// keypress gets counted multiple times no matter how quick you press the button.
-		// This makes it so we should only full screen one time before waiting for a different
-		// action to fire to allow fullscreening again.
-		// Otherwise we end up calling `ToggleFullscreen` half a dozen times in < 1 sec
-		if action == nil {
-			canFullscreen = true
-			canMove = true
-		} else if action.actionType == Fullscreen && canFullscreen {
+		fullscreen := action != nil && action.actionType == Fullscreen
+		if fullscreen {
 			rl.ToggleFullscreen()
-			canFullscreen = false
-		} else if action.actionType == Movement && canMove {
+		}
+
+		movement := action != nil && action.actionType == Movement
+		if movement && gameState == PlayersTurn {
 			destinationX := player.X + action.actionMovement.dx
 			destinationY := player.Y + action.actionMovement.dy
 			isBlocked := gameMap.IsPlayerBlocked(destinationX, destinationY)
@@ -80,12 +75,21 @@ func main() {
 					)
 					fovRecompute = true
 				}
-				canMove = false
+				gameState = EnemyTurn
 			}
 		}
 
 		if fovRecompute {
 			gameMap.RecomputeFov(player.X, player.Y, FovRadius)
+		}
+
+		if gameState == EnemyTurn {
+			for _, entity := range entities {
+				if entity != player {
+					fmt.Printf("The %s ponders the meaning of it's existance", entity.Name)
+				}
+			}
+			gameState = PlayersTurn
 		}
 
 		// Draw
