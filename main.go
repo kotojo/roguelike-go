@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/kotojo/roguelike_go/entity"
 	"github.com/kotojo/roguelike_go/map_objects"
@@ -29,10 +31,12 @@ func main() {
 	dejaVuFont := rl.LoadFont("DejaVuSansMono.ttf")
 
 	player := &entity.Entity{
-		X:     int(mapWidth) / 2,
-		Y:     int(mapHeight) / 2,
-		Char:  "@",
-		Color: rl.White,
+		X:      int(mapWidth) / 2,
+		Y:      int(mapHeight) / 2,
+		Char:   "@",
+		Color:  rl.White,
+		Name:   "Player",
+		Blocks: true,
 	}
 
 	entities := []*entity.Entity{
@@ -61,16 +65,23 @@ func main() {
 			rl.ToggleFullscreen()
 			canFullscreen = false
 		} else if action.actionType == Movement && canMove {
-			isBlocked := gameMap.IsPlayerBlocked(player.X+action.actionMovement.dx, player.Y+action.actionMovement.dy)
+			destinationX := player.X + action.actionMovement.dx
+			destinationY := player.Y + action.actionMovement.dy
+			isBlocked := gameMap.IsPlayerBlocked(destinationX, destinationY)
 
 			if !isBlocked {
-				player.Move(
-					action.actionMovement.dx,
-					action.actionMovement.dy,
-				)
+				target := entity.GetBlockingEntitiesAtLocation(entities, destinationX, destinationY)
+				if target != nil {
+					fmt.Printf("You kick %s in the shins, much to its annoyance \n", target.Name)
+				} else {
+					player.Move(
+						action.actionMovement.dx,
+						action.actionMovement.dy,
+					)
+					fovRecompute = true
+				}
+				canMove = false
 			}
-			canMove = false
-			fovRecompute = true
 		}
 
 		if fovRecompute {

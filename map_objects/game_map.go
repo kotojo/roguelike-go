@@ -153,17 +153,21 @@ func (g *GameMap) placeEntities(room *Rect, entities *[]*entity.Entity, maxMonst
 			var monster *entity.Entity
 			if rand.Intn(100) < 80 {
 				monster = &entity.Entity{
-					X:     x,
-					Y:     y,
-					Char:  "o",
-					Color: rl.Green,
+					X:      x,
+					Y:      y,
+					Char:   "o",
+					Color:  rl.Green,
+					Name:   "Orc",
+					Blocks: true,
 				}
 			} else {
 				monster = &entity.Entity{
-					X:     x,
-					Y:     y,
-					Char:  "T",
-					Color: rl.DarkGreen,
+					X:      x,
+					Y:      y,
+					Char:   "T",
+					Color:  rl.DarkGreen,
+					Name:   "Troll",
+					Blocks: true,
 				}
 			}
 			*entities = append(*entities, monster)
