@@ -26,7 +26,7 @@ func main() {
 
 	rl.SetTargetFPS(60)
 
-	pixelFont := rl.LoadFont("pixelplay.png")
+	dejaVuFont := rl.LoadFont("DejaVuSansMono.ttf")
 
 	player := &entity.Entity{
 		X:     int(mapWidth) / 2,
@@ -82,13 +82,13 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		renderAll(pixelFont, entities, gameMap)
+		renderAll(dejaVuFont, entities, gameMap)
 		fovRecompute = false
 
 		rl.EndDrawing()
 	}
 
-	rl.UnloadFont(pixelFont)
+	rl.UnloadFont(dejaVuFont)
 
 	rl.CloseWindow()
 }

@@ -193,6 +193,7 @@ func (g *GameMap) RecomputeFov(centerX, centerY, radius int) {
 			}
 		}
 	}
+	g.Tiles[centerX][centerY].Viewable = true
 	for angle := float64(1); angle <= 360; angle += .18 {
 		dist := 0
 		// set x, y to + .5 to do calculations from center of tile
