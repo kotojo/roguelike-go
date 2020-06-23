@@ -181,35 +181,37 @@ func (g *GameMap) IsPlayerBlocked(x, y int) bool {
 
 // RecomputeFov sets the Viewable property for each
 // tile based on the radius for fov provided.
+// Algorithm source:
+// http://www.roguebasin.com/index.php?title=Simple_and_accurate_LOS_function_for_BlitzMax
 func (g *GameMap) RecomputeFov(centerX, centerY, radius int) {
-	// We start by getting the area of the map to iterate through
-	// as a square with (radius * 2) + 1 width and height.
-	// The addition +/- 1 is to make sure we set the tiles viewable
-	// on the last player movement back to false since they would have
-	// just moved 1 square to trigger this recalculation
-	startingX := centerX - radius - 1
-	endingX := centerX + radius + 1
-	startingY := centerY - radius - 1
-	endingY := centerY + radius + 1
-	floatCenterX := float64(centerX)
-	floatCenterY := float64(centerY)
-	floatRadius := float64(radius)
-	for x := startingX; x <= endingX; x++ {
-		if x < 0 || x >= len(g.Tiles) {
-			continue
-		}
-		row := g.Tiles[x]
-		for y := startingY; y <= endingY; y++ {
-			// Check if the tile is within viewing distance,
-			// and set `tile.Viewable`
-			if y < 0 || y >= len(row) {
-				continue
-			}
-			tile := row[y]
-			if math.Sqrt(math.Pow(float64(x)-floatCenterX, 2)+math.Pow(float64(y)-floatCenterY, 2)) > floatRadius {
+	// reset all tiles as not viewable
+	for x := 0; x < len(g.Tiles); x++ {
+		for y := 0; y < len(g.Tiles[x]); y++ {
+			tile := g.Tiles[x][y]
+			if tile.Viewable {
 				tile.Viewable = false
-			} else {
-				tile.Viewable = true
+			}
+		}
+	}
+	for angle := float64(1); angle <= 360; angle += .18 {
+		dist := 0
+		// set x, y to + .5 to do calculations from center of tile
+		x := float64(centerX) + .5
+		y := float64(centerY) + .5
+		xMove := math.Cos(angle)
+		yMove := math.Sin(angle)
+
+		for {
+			x += xMove
+			y += yMove
+			dist += 1
+			if dist > radius || x >= float64(g.Width) || x < 0 || y >= float64(g.Height) || y < 0 {
+				break
+			}
+			tile := g.Tiles[int(x)][int(y)]
+			tile.Viewable = true
+			if tile.BlockSight {
+				break
 			}
 		}
 	}
