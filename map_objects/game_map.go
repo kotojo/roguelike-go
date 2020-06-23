@@ -15,13 +15,11 @@ type GameMap struct {
 	Tiles  [][]*Tile
 }
 
-func NewGameMap(width, height int) *GameMap {
+func NewGameMap(Width, Height int) *GameMap {
 	rand.Seed(time.Now().UnixNano())
-	g := new(GameMap)
-	g.Width = width
-	g.Height = height
+	g := GameMap{Width, Height, nil}
 	g.initializeTiles()
-	return g
+	return &g
 }
 
 func (g *GameMap) initializeTiles() {
@@ -152,23 +150,21 @@ func (g *GameMap) placeEntities(room *Rect, entities *[]*entity.Entity, maxMonst
 		if !entityInLoc {
 			var monster *entity.Entity
 			if rand.Intn(100) < 80 {
-				monster = &entity.Entity{
-					X:      x,
-					Y:      y,
-					Char:   "o",
-					Color:  rl.Green,
-					Name:   "Orc",
-					Blocks: true,
+				monsterFighter := &entity.Fighter{
+					Hp:      10,
+					Defense: 0,
+					Power:   3,
 				}
+				monsterAi := &entity.BasicMonster{}
+				monster = entity.NewEntity(x, y, "O", rl.DarkGreen, "Orc", true, monsterFighter, monsterAi)
 			} else {
-				monster = &entity.Entity{
-					X:      x,
-					Y:      y,
-					Char:   "T",
-					Color:  rl.DarkGreen,
-					Name:   "Troll",
-					Blocks: true,
+				monsterFighter := &entity.Fighter{
+					Hp:      16,
+					Defense: 1,
+					Power:   4,
 				}
+				monsterAi := &entity.BasicMonster{}
+				monster = entity.NewEntity(x, y, "T", rl.DarkGreen, "Troll", true, monsterFighter, monsterAi)
 			}
 			*entities = append(*entities, monster)
 		}

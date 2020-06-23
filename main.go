@@ -30,14 +30,12 @@ func main() {
 
 	dejaVuFont := rl.LoadFont("DejaVuSansMono.ttf")
 
-	player := &entity.Entity{
-		X:      int(mapWidth) / 2,
-		Y:      int(mapHeight) / 2,
-		Char:   "@",
-		Color:  rl.White,
-		Name:   "Player",
-		Blocks: true,
+	playerFighter := &entity.Fighter{
+		Hp:      30,
+		Defense: 2,
+		Power:   5,
 	}
+	player := entity.NewEntity(int(mapWidth)/2, int(mapHeight)/2, "@", rl.White, "Player", true, playerFighter, nil)
 
 	entities := []*entity.Entity{
 		player,
@@ -85,8 +83,8 @@ func main() {
 
 		if gameState == EnemyTurn {
 			for _, entity := range entities {
-				if entity != player {
-					fmt.Printf("The %s ponders the meaning of it's existance", entity.Name)
+				if entity.Ai != nil {
+					entity.Ai.TakeTurn()
 				}
 			}
 			gameState = PlayersTurn
