@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"math"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -31,6 +33,23 @@ func NewEntity(X, Y int, Char string, Color rl.Color, Name string, Blocks bool, 
 func (e *Entity) Move(x, y int) {
 	e.X += x
 	e.Y += y
+}
+
+func (e *Entity) MoveTo(x, y int) {
+	e.X = x
+	e.Y = y
+}
+
+func (e *Entity) MoveAStar(gameMap Map, target *Entity) {
+	l := AStarPath(gameMap, e.X, e.Y, target.X, target.Y)
+	move := l.Front().Value.([]int)
+	e.MoveTo(move[0], move[1])
+}
+
+func (e *Entity) DistanceTo(target *Entity) int {
+	dx := target.X - e.X
+	dy := target.Y - e.Y
+	return int(math.Sqrt(float64(dx*dx + dy*dy)))
 }
 
 func GetBlockingEntitiesAtLocation(entities []*Entity, destinationX, destinationY int) *Entity {

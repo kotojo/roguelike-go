@@ -84,7 +84,7 @@ func main() {
 		if gameState == EnemyTurn {
 			for _, entity := range entities {
 				if entity.Ai != nil {
-					entity.Ai.TakeTurn()
+					entity.Ai.TakeTurn(player, gameMap)
 				}
 			}
 			gameState = PlayersTurn

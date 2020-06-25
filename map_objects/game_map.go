@@ -229,3 +229,23 @@ func (g *GameMap) MapIsInFov(x, y int) bool {
 	}
 	return tile.Viewable
 }
+
+func (g *GameMap) Neighbors(x, y int) [][]int {
+	dirs := [][]int{{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}}
+	var result [][]int
+	for _, dir := range dirs {
+		tileRow := g.Tiles[x+dir[0]]
+		if tileRow == nil {
+			continue
+		}
+		tile := tileRow[y+dir[1]]
+		if tile != nil && !tile.Blocked {
+			result = append(result, []int{x + dir[0], y + dir[1]})
+		}
+	}
+	return result
+}
+
+func (g *GameMap) Cost(startX, startY, endX, endY int) int {
+	return int(math.Abs(float64(startX-endX)) + math.Abs(float64(startY-endY)))
+}
