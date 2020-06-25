@@ -6,6 +6,19 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type ActionResultType int
+
+const (
+	Message ActionResultType = iota + 1
+	Dead
+)
+
+type ActionResult struct {
+	ResultType    ActionResultType
+	ActionMessage string
+	DeadEntity    *Entity
+}
+
 type Entity struct {
 	X       int
 	Y       int

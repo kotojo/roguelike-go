@@ -1,7 +1,5 @@
 package entity
 
-import "fmt"
-
 type BasicMonster struct {
 	Owner *Entity
 }
@@ -12,13 +10,16 @@ type Map interface {
 	Cost(x, y, xx, yy int) int
 }
 
-func (b *BasicMonster) TakeTurn(target *Entity, gameMap Map) {
+func (b *BasicMonster) TakeTurn(target *Entity, gameMap Map) []*ActionResult {
+	var results []*ActionResult
 	monster := b.Owner
 	if gameMap.MapIsInFov(monster.X, monster.Y) {
 		if monster.DistanceTo(target) >= 2 {
 			monster.MoveAStar(gameMap, target)
 		} else if target.Fighter != nil && target.Fighter.Hp > 0 {
-			fmt.Printf("The %v insults you! Your ego is damaged!", monster.Name)
+			attackResults := monster.Fighter.Attack(target)
+			results = append(results, attackResults...)
 		}
 	}
+	return results
 }

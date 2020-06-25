@@ -56,6 +56,8 @@ func main() {
 			rl.ToggleFullscreen()
 		}
 
+		var playerTurnResults []*entity.ActionResult
+
 		movement := action != nil && action.actionType == Movement
 		if movement && gameState == PlayersTurn {
 			destinationX := player.X + action.actionMovement.dx
@@ -65,7 +67,8 @@ func main() {
 			if !isBlocked {
 				target := entity.GetBlockingEntitiesAtLocation(entities, destinationX, destinationY)
 				if target != nil {
-					fmt.Printf("You kick %s in the shins, much to its annoyance \n", target.Name)
+					attackResults := player.Fighter.Attack(target)
+					playerTurnResults = append(playerTurnResults, attackResults...)
 				} else {
 					player.Move(
 						action.actionMovement.dx,
@@ -81,10 +84,29 @@ func main() {
 			gameMap.RecomputeFov(player.X, player.Y, FovRadius)
 		}
 
+		for _, playerTurnResult := range playerTurnResults {
+			resultType := playerTurnResult.ResultType
+			if resultType == entity.Message {
+				fmt.Println(playerTurnResult.ActionMessage)
+			}
+			if resultType == entity.Dead {
+				fmt.Println("death!")
+			}
+		}
+
 		if gameState == EnemyTurn {
-			for _, entity := range entities {
-				if entity.Ai != nil {
-					entity.Ai.TakeTurn(player, gameMap)
+			for _, e := range entities {
+				if e.Ai != nil {
+					enemyTurnResults := e.Ai.TakeTurn(player, gameMap)
+					for _, enemyTurnResult := range enemyTurnResults {
+						resultType := enemyTurnResult.ResultType
+						if resultType == entity.Message {
+							fmt.Println(enemyTurnResult.ActionMessage)
+						}
+						if resultType == entity.Dead {
+							fmt.Println("death!")
+						}
+					}
 				}
 			}
 			gameState = PlayersTurn
