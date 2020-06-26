@@ -16,8 +16,12 @@ const MaxMonstersPerRoom = 3
 func main() {
 	var screenWidth int32 = 80 * BlockSize
 	var screenHeight int32 = 50 * BlockSize
+	var panelWidth int32 = screenWidth / 2
+	var panelHeight int32 = 3 * BlockSize
 	mapWidth := 80
-	mapHeight := 45
+	mapHeight := 43
+	panelX := (screenWidth / 2) - (panelWidth / 2)
+	panelY := int32(mapHeight) * BlockSize
 
 	roomMaxSize := 10
 	roomMinSize := 6
@@ -33,6 +37,7 @@ func main() {
 
 	playerFighter := &entity.Fighter{
 		Hp:      30,
+		MaxHp:   30,
 		Defense: 2,
 		Power:   5,
 	}
@@ -132,7 +137,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		renderAll(dejaVuFont, entities, player, gameMap, screenHeight)
+		renderAll(dejaVuFont, entities, player, gameMap, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight)
 		fovRecompute = false
 
 		rl.EndDrawing()

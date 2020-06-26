@@ -9,7 +9,7 @@ import (
 	"github.com/kotojo/roguelike_go/map_objects"
 )
 
-func renderAll(font rl.Font, entities []*entity.Entity, player *entity.Entity, gameMap *map_objects.GameMap, screenHeight int32) {
+func renderAll(font rl.Font, entities []*entity.Entity, player *entity.Entity, gameMap *map_objects.GameMap, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight int32) {
 	for y := 0; y < gameMap.Height; y++ {
 		for x := 0; x < gameMap.Width; x++ {
 			tile := gameMap.Tiles[x][y]
@@ -50,7 +50,7 @@ func renderAll(font rl.Font, entities []*entity.Entity, player *entity.Entity, g
 	for _, entity := range entities {
 		drawEntity(font, entity, gameMap)
 	}
-	rl.DrawTextEx(font, fmt.Sprintf("HP: %d/%d", player.Fighter.Hp, player.Fighter.MaxHp), rl.Vector2{X: 1, Y: float32(screenHeight) - BlockSize}, BlockSize, 0, rl.Black)
+	renderBar(font, panelX, panelY, panelWidth, panelHeight, "HP", player.Fighter.Hp, player.Fighter.MaxHp, rl.Red, rl.Maroon)
 }
 
 func drawEntity(font rl.Font, entity *entity.Entity, gameMap *map_objects.GameMap) {
@@ -71,4 +71,20 @@ func drawEntity(font rl.Font, entity *entity.Entity, gameMap *map_objects.GameMa
 			false,
 			entity.Color)
 	}
+}
+
+func renderBar(font rl.Font, x, y, width, height int32, name string, value, maximum int, barColor, backColor rl.Color) {
+	barWidth := int32(float32(value) / float32(maximum) * float32(width))
+	rl.DrawRectangle(x, y, width, height, backColor)
+	if barWidth > 0 {
+		rl.DrawRectangle(x, y, barWidth, height, barColor)
+	}
+	text := fmt.Sprintf("%s: %d/%d", name, value, maximum)
+	textHeight := float32(height) / 2
+	textSize := rl.MeasureTextEx(font, text, textHeight, 0)
+	textPos := rl.Vector2{
+		X: float32(x+width/2) - textSize.X/2,
+		Y: float32(y) + (float32(height) / 4),
+	}
+	rl.DrawTextEx(font, text, textPos, textHeight, 0, rl.White)
 }

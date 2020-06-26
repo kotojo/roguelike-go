@@ -153,6 +153,7 @@ func (g *GameMap) placeEntities(room *Rect, entities *[]*entity.Entity, maxMonst
 			if rand.Intn(100) < 80 {
 				monsterFighter := &entity.Fighter{
 					Hp:      10,
+					MaxHp:   10,
 					Defense: 0,
 					Power:   3,
 				}
@@ -161,6 +162,7 @@ func (g *GameMap) placeEntities(room *Rect, entities *[]*entity.Entity, maxMonst
 			} else {
 				monsterFighter := &entity.Fighter{
 					Hp:      16,
+					MaxHp:   16,
 					Defense: 1,
 					Power:   4,
 				}
