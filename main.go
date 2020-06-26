@@ -6,6 +6,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/kotojo/roguelike_go/entity"
 	"github.com/kotojo/roguelike_go/map_objects"
+	"github.com/kotojo/roguelike_go/render_order"
 )
 
 const BlockSize = 16
@@ -35,7 +36,7 @@ func main() {
 		Defense: 2,
 		Power:   5,
 	}
-	player := entity.NewEntity(int(mapWidth)/2, int(mapHeight)/2, "@", rl.White, "Player", true, playerFighter, nil)
+	player := entity.NewEntity(int(mapWidth)/2, int(mapHeight)/2, "@", rl.White, "Player", true, render_order.Actor, playerFighter, nil)
 
 	entities := []*entity.Entity{
 		player,
@@ -90,7 +91,13 @@ func main() {
 				fmt.Println(playerTurnResult.ActionMessage)
 			}
 			if resultType == entity.Dead {
-				fmt.Println("death!")
+				var message string
+				if playerTurnResult.DeadEntity == player {
+					message, gameState = killPlayer(player)
+				} else {
+					message = killMonster(playerTurnResult.DeadEntity)
+				}
+				fmt.Println(message)
 			}
 		}
 
@@ -104,12 +111,20 @@ func main() {
 							fmt.Println(enemyTurnResult.ActionMessage)
 						}
 						if resultType == entity.Dead {
-							fmt.Println("death!")
+							var message string
+							if enemyTurnResult.DeadEntity == player {
+								message, gameState = killPlayer(player)
+							} else {
+								message = killMonster(enemyTurnResult.DeadEntity)
+							}
+							fmt.Println(message)
 						}
 					}
 				}
 			}
-			gameState = PlayersTurn
+			if gameState != PlayerDead {
+				gameState = PlayersTurn
+			}
 		}
 
 		// Draw
@@ -117,7 +132,7 @@ func main() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		renderAll(dejaVuFont, entities, gameMap)
+		renderAll(dejaVuFont, entities, player, gameMap, screenHeight)
 		fovRecompute = false
 
 		rl.EndDrawing()

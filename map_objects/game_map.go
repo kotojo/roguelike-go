@@ -7,6 +7,7 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/kotojo/roguelike_go/entity"
+	"github.com/kotojo/roguelike_go/render_order"
 )
 
 type GameMap struct {
@@ -156,7 +157,7 @@ func (g *GameMap) placeEntities(room *Rect, entities *[]*entity.Entity, maxMonst
 					Power:   3,
 				}
 				monsterAi := &entity.BasicMonster{}
-				monster = entity.NewEntity(x, y, "O", rl.DarkGreen, "Orc", true, monsterFighter, monsterAi)
+				monster = entity.NewEntity(x, y, "O", rl.DarkGreen, "Orc", true, render_order.Actor, monsterFighter, monsterAi)
 			} else {
 				monsterFighter := &entity.Fighter{
 					Hp:      16,
@@ -164,7 +165,7 @@ func (g *GameMap) placeEntities(room *Rect, entities *[]*entity.Entity, maxMonst
 					Power:   4,
 				}
 				monsterAi := &entity.BasicMonster{}
-				monster = entity.NewEntity(x, y, "T", rl.DarkGreen, "Troll", true, monsterFighter, monsterAi)
+				monster = entity.NewEntity(x, y, "T", rl.DarkGreen, "Troll", true, render_order.Actor, monsterFighter, monsterAi)
 			}
 			*entities = append(*entities, monster)
 		}
