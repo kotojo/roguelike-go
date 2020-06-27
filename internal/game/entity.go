@@ -1,10 +1,9 @@
-package entity
+package game
 
 import (
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/kotojo/roguelike_go/render_order"
 )
 
 type ActionResultType int
@@ -27,12 +26,12 @@ type Entity struct {
 	Color       rl.Color
 	Name        string
 	Blocks      bool
-	RenderOrder render_order.RenderOrder
+	RenderOrder RenderOrder
 	Fighter     *Fighter
 	Ai          *BasicMonster
 }
 
-func NewEntity(X, Y int, Char string, Color rl.Color, Name string, Blocks bool, RenderOrder render_order.RenderOrder, Fighter *Fighter, Ai *BasicMonster) *Entity {
+func NewEntity(X, Y int, Char string, Color rl.Color, Name string, Blocks bool, RenderOrder RenderOrder, Fighter *Fighter, Ai *BasicMonster) *Entity {
 	e := Entity{X, Y, Char, Color, Name, Blocks, RenderOrder, nil, nil}
 	if Fighter != nil {
 		e.Fighter = Fighter

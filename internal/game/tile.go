@@ -1,4 +1,4 @@
-package map_objects
+package game
 
 type Tile struct {
 	Blocked    bool

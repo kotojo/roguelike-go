@@ -1,4 +1,4 @@
-package map_objects
+package game
 
 // Rect is used to define the structure of any
 // rooms or spaces in the game map that the player

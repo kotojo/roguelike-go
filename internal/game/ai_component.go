@@ -1,4 +1,4 @@
-package entity
+package game
 
 type BasicMonster struct {
 	Owner *Entity

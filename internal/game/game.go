@@ -1,19 +1,16 @@
-package main
+package game
 
 import (
 	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-	"github.com/kotojo/roguelike_go/entity"
-	"github.com/kotojo/roguelike_go/map_objects"
-	"github.com/kotojo/roguelike_go/render_order"
 )
 
 const BlockSize = 16
 const FovRadius = 10
 const MaxMonstersPerRoom = 3
 
-func main() {
+func StartGame() {
 	var screenWidth int32 = 80 * BlockSize
 	var screenHeight int32 = 50 * BlockSize
 	var panelWidth int32 = screenWidth / 2
@@ -35,19 +32,19 @@ func main() {
 
 	dejaVuFont := rl.LoadFont("DejaVuSansMono.ttf")
 
-	playerFighter := &entity.Fighter{
+	playerFighter := &Fighter{
 		Hp:      30,
 		MaxHp:   30,
 		Defense: 2,
 		Power:   5,
 	}
-	player := entity.NewEntity(int(mapWidth)/2, int(mapHeight)/2, "@", rl.White, "Player", true, render_order.Actor, playerFighter, nil)
+	player := NewEntity(int(mapWidth)/2, int(mapHeight)/2, "@", rl.White, "Player", true, RenderOrderActor, playerFighter, nil)
 
-	entities := []*entity.Entity{
+	entities := []*Entity{
 		player,
 	}
 
-	gameMap := map_objects.NewGameMap(mapWidth, mapHeight)
+	gameMap := NewGameMap(mapWidth, mapHeight)
 	gameMap.MakeMap(maxRooms, roomMinSize, roomMaxSize, mapWidth, mapHeight, player, &entities, MaxMonstersPerRoom)
 
 	fovRecompute := true
@@ -62,7 +59,7 @@ func main() {
 			rl.ToggleFullscreen()
 		}
 
-		var playerTurnResults []*entity.ActionResult
+		var playerTurnResults []*ActionResult
 
 		movement := action != nil && action.actionType == Movement
 		if movement && gameState == PlayersTurn {
@@ -71,7 +68,7 @@ func main() {
 			isBlocked := gameMap.IsPlayerBlocked(destinationX, destinationY)
 
 			if !isBlocked {
-				target := entity.GetBlockingEntitiesAtLocation(entities, destinationX, destinationY)
+				target := GetBlockingEntitiesAtLocation(entities, destinationX, destinationY)
 				if target != nil {
 					attackResults := player.Fighter.Attack(target)
 					playerTurnResults = append(playerTurnResults, attackResults...)
@@ -92,10 +89,10 @@ func main() {
 
 		for _, playerTurnResult := range playerTurnResults {
 			resultType := playerTurnResult.ResultType
-			if resultType == entity.Message {
+			if resultType == Message {
 				fmt.Println(playerTurnResult.ActionMessage)
 			}
-			if resultType == entity.Dead {
+			if resultType == Dead {
 				var message string
 				if playerTurnResult.DeadEntity == player {
 					message, gameState = killPlayer(player)
@@ -112,10 +109,10 @@ func main() {
 					enemyTurnResults := e.Ai.TakeTurn(player, gameMap)
 					for _, enemyTurnResult := range enemyTurnResults {
 						resultType := enemyTurnResult.ResultType
-						if resultType == entity.Message {
+						if resultType == Message {
 							fmt.Println(enemyTurnResult.ActionMessage)
 						}
-						if resultType == entity.Dead {
+						if resultType == Dead {
 							var message string
 							if enemyTurnResult.DeadEntity == player {
 								message, gameState = killPlayer(player)

@@ -1,4 +1,4 @@
-package entity
+package game
 
 // An Item is something we manage in a priority queue.
 type Item struct {
