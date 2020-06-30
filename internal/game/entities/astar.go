@@ -1,4 +1,4 @@
-package game
+package entities
 
 import (
 	"container/heap"
@@ -6,6 +6,11 @@ import (
 	"fmt"
 )
 
+// AStarPath uses the A* algorithm to find the optimal path to the goal
+// The primary use of this is for the AiComponent to find the path
+// to the player's current location.
+// It returns a linked list where each node contains the optimal move
+// to make in the direction of the goal.
 func AStarPath(gameMap Map, startX, startY, goalX, goalY int) *list.List {
 	frontier := make(PriorityQueue, 1)
 	start := &Item{

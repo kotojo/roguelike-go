@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/kotojo/roguelike_go/internal/game/entities"
+	"github.com/kotojo/roguelike_go/internal/game/state"
 )
 
 const BlockSize = 16
@@ -32,24 +34,18 @@ func StartGame() {
 
 	dejaVuFont := rl.LoadFont("DejaVuSansMono.ttf")
 
-	playerFighter := &Fighter{
-		Hp:      30,
-		MaxHp:   30,
-		Defense: 2,
-		Power:   5,
-	}
-	player := NewEntity(int(mapWidth)/2, int(mapHeight)/2, "@", rl.White, "Player", true, RenderOrderActor, playerFighter, nil)
+	player := entities.NewPlayer(int(mapWidth)/2, int(mapHeight)/2)
 
-	entities := []*Entity{
+	ents := []*entities.Entity{
 		player,
 	}
 
 	gameMap := NewGameMap(mapWidth, mapHeight)
-	gameMap.MakeMap(maxRooms, roomMinSize, roomMaxSize, mapWidth, mapHeight, player, &entities, MaxMonstersPerRoom)
+	gameMap.MakeMap(maxRooms, roomMinSize, roomMaxSize, mapWidth, mapHeight, player, &ents, MaxMonstersPerRoom)
 
 	fovRecompute := true
 
-	gameState := PlayersTurn
+	gameState := state.PlayersTurn
 	for !rl.WindowShouldClose() {
 		// Movement
 		action := handleKeys()
@@ -59,19 +55,34 @@ func StartGame() {
 			rl.ToggleFullscreen()
 		}
 
-		var playerTurnResults []*ActionResult
+		var playerTurnResults []*state.ActionResult
 
 		movement := action != nil && action.actionType == Movement
-		if movement && gameState == PlayersTurn {
+		if movement && gameState == state.PlayersTurn {
 			destinationX := player.X + action.actionMovement.dx
 			destinationY := player.Y + action.actionMovement.dy
 			isBlocked := gameMap.IsPlayerBlocked(destinationX, destinationY)
 
 			if !isBlocked {
-				target := GetBlockingEntitiesAtLocation(entities, destinationX, destinationY)
+				target := entities.GetBlockingEntitiesAtLocation(ents, destinationX, destinationY)
 				if target != nil {
 					attackResults := player.Fighter.Attack(target)
 					playerTurnResults = append(playerTurnResults, attackResults...)
+					for _, playerTurnResult := range playerTurnResults {
+						resultType := playerTurnResult.ResultType
+						if resultType == state.Message {
+							fmt.Println(playerTurnResult.ActionMessage)
+						}
+						if resultType == state.Dead {
+							var message string
+							if player.Fighter.Hp <= 0 {
+								message, gameState = entities.KillPlayer(player)
+							} else {
+								message = entities.KillMonster(target)
+							}
+							fmt.Println(message)
+						}
+					}
 				} else {
 					player.Move(
 						action.actionMovement.dx,
@@ -79,7 +90,9 @@ func StartGame() {
 					)
 					fovRecompute = true
 				}
-				gameState = EnemyTurn
+				if gameState != state.PlayerDead {
+					gameState = state.EnemyTurn
+				}
 			}
 		}
 
@@ -87,45 +100,29 @@ func StartGame() {
 			gameMap.RecomputeFov(player.X, player.Y, FovRadius)
 		}
 
-		for _, playerTurnResult := range playerTurnResults {
-			resultType := playerTurnResult.ResultType
-			if resultType == Message {
-				fmt.Println(playerTurnResult.ActionMessage)
-			}
-			if resultType == Dead {
-				var message string
-				if playerTurnResult.DeadEntity == player {
-					message, gameState = killPlayer(player)
-				} else {
-					message = killMonster(playerTurnResult.DeadEntity)
-				}
-				fmt.Println(message)
-			}
-		}
-
-		if gameState == EnemyTurn {
-			for _, e := range entities {
-				if e.Ai != nil {
-					enemyTurnResults := e.Ai.TakeTurn(player, gameMap)
+		if gameState == state.EnemyTurn {
+			for _, enemy := range ents {
+				if enemy.Ai != nil {
+					enemyTurnResults := enemy.Ai.TakeTurn(player, gameMap)
 					for _, enemyTurnResult := range enemyTurnResults {
 						resultType := enemyTurnResult.ResultType
-						if resultType == Message {
+						if resultType == state.Message {
 							fmt.Println(enemyTurnResult.ActionMessage)
 						}
-						if resultType == Dead {
+						if resultType == state.Dead {
 							var message string
-							if enemyTurnResult.DeadEntity == player {
-								message, gameState = killPlayer(player)
+							if player.Fighter.Hp <= 0 {
+								message, gameState = entities.KillPlayer(player)
 							} else {
-								message = killMonster(enemyTurnResult.DeadEntity)
+								message = entities.KillMonster(enemy)
 							}
 							fmt.Println(message)
 						}
 					}
 				}
 			}
-			if gameState != PlayerDead {
-				gameState = PlayersTurn
+			if gameState != state.PlayerDead {
+				gameState = state.PlayersTurn
 			}
 		}
 
@@ -134,7 +131,7 @@ func StartGame() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		renderAll(dejaVuFont, entities, player, gameMap, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight)
+		renderAll(dejaVuFont, ents, player, gameMap, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight)
 		fovRecompute = false
 
 		rl.EndDrawing()

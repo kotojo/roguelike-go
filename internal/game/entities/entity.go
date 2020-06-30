@@ -1,23 +1,10 @@
-package game
+package entities
 
 import (
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
-
-type ActionResultType int
-
-const (
-	Message ActionResultType = iota + 1
-	Dead
-)
-
-type ActionResult struct {
-	ResultType    ActionResultType
-	ActionMessage string
-	DeadEntity    *Entity
-}
 
 type Entity struct {
 	X           int
@@ -31,7 +18,39 @@ type Entity struct {
 	Ai          *BasicMonster
 }
 
-func NewEntity(X, Y int, Char string, Color rl.Color, Name string, Blocks bool, RenderOrder RenderOrder, Fighter *Fighter, Ai *BasicMonster) *Entity {
+func NewPlayer(X, Y int) *Entity {
+	playerFighter := &Fighter{
+		Hp:      30,
+		MaxHp:   30,
+		Defense: 2,
+		Power:   5,
+	}
+	return newEntity(X, Y, "@", rl.White, "Player", true, RenderOrderActor, playerFighter, nil)
+}
+
+func NewOrc(X, Y int) *Entity {
+	monsterFighter := &Fighter{
+		Hp:      10,
+		MaxHp:   10,
+		Defense: 0,
+		Power:   3,
+	}
+	monsterAi := &BasicMonster{}
+	return newEntity(X, Y, "O", rl.DarkGreen, "Orc", true, RenderOrderActor, monsterFighter, monsterAi)
+}
+
+func NewTroll(X, Y int) *Entity {
+	monsterFighter := &Fighter{
+		Hp:      16,
+		MaxHp:   16,
+		Defense: 1,
+		Power:   4,
+	}
+	monsterAi := &BasicMonster{}
+	return newEntity(X, Y, "T", rl.DarkGreen, "Troll", true, RenderOrderActor, monsterFighter, monsterAi)
+}
+
+func newEntity(X, Y int, Char string, Color rl.Color, Name string, Blocks bool, RenderOrder RenderOrder, Fighter *Fighter, Ai *BasicMonster) *Entity {
 	e := Entity{X, Y, Char, Color, Name, Blocks, RenderOrder, nil, nil}
 	if Fighter != nil {
 		e.Fighter = Fighter

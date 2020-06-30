@@ -1,4 +1,4 @@
-package game
+package state
 
 type GameState int
 

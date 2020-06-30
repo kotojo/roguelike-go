@@ -1,4 +1,7 @@
-package game
+package entities
+
+// This code was lifted from the go docs for "container/heap"
+// https://golang.org/pkg/container/heap/
 
 // An Item is something we manage in a priority queue.
 type Item struct {

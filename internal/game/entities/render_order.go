@@ -1,4 +1,4 @@
-package game
+package entities
 
 type RenderOrder int
 

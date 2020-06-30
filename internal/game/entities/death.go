@@ -1,19 +1,20 @@
-package game
+package entities
 
 import (
 	"fmt"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/kotojo/roguelike_go/internal/game/state"
 )
 
-func killPlayer(player *Entity) (string, GameState) {
+func KillPlayer(player *Entity) (string, state.GameState) {
 	player.Char = "%"
 	player.Color = rl.Red
 
-	return "You died!", PlayerDead
+	return "You died!", state.PlayerDead
 }
 
-func killMonster(monster *Entity) string {
+func KillMonster(monster *Entity) string {
 	deathMessage := fmt.Sprintf("%s is dead!", monster.Name)
 	monster.Char = "%"
 	monster.Color = rl.Red

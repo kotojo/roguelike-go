@@ -5,7 +5,7 @@ import (
 	"math/rand"
 	"time"
 
-	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/kotojo/roguelike_go/internal/game/entities"
 )
 
 type GameMap struct {
@@ -41,8 +41,8 @@ func (g *GameMap) MakeMap(
 	roomMaxSize,
 	mapWidth,
 	mapHeight int,
-	player *Entity,
-	entities *[]*Entity,
+	player *entities.Entity,
+	entities *[]*entities.Entity,
 	maxMonstersPerRoom int,
 ) {
 	rooms := []*Rect{}
@@ -129,7 +129,7 @@ func (g *GameMap) createVTunnel(y1, y2, x int) {
 	}
 }
 
-func (g *GameMap) placeEntities(room *Rect, entities *[]*Entity, maxMonstersPerRoom int) {
+func (g *GameMap) placeEntities(room *Rect, ents *[]*entities.Entity, maxMonstersPerRoom int) {
 	numOfMonsters := rand.Intn(maxMonstersPerRoom)
 	for i := 0; i < numOfMonsters; i++ {
 		minX := room.X1 + 1
@@ -139,35 +139,21 @@ func (g *GameMap) placeEntities(room *Rect, entities *[]*Entity, maxMonstersPerR
 		maxY := room.Y2 - 1
 		y := rand.Intn(maxY-minY) + minY
 		entityInLoc := false
-		for j := 0; j < len(*entities); j++ {
-			entity := (*entities)[j]
+		for j := 0; j < len(*ents); j++ {
+			entity := (*ents)[j]
 			if entity.X == x && entity.Y == y {
 				entityInLoc = true
 				break
 			}
 		}
 		if !entityInLoc {
-			var monster *Entity
+			var monster *entities.Entity
 			if rand.Intn(100) < 80 {
-				monsterFighter := &Fighter{
-					Hp:      10,
-					MaxHp:   10,
-					Defense: 0,
-					Power:   3,
-				}
-				monsterAi := &BasicMonster{}
-				monster = NewEntity(x, y, "O", rl.DarkGreen, "Orc", true, RenderOrderActor, monsterFighter, monsterAi)
+				monster = entities.NewOrc(x, y)
 			} else {
-				monsterFighter := &Fighter{
-					Hp:      16,
-					MaxHp:   16,
-					Defense: 1,
-					Power:   4,
-				}
-				monsterAi := &BasicMonster{}
-				monster = NewEntity(x, y, "T", rl.DarkGreen, "Troll", true, RenderOrderActor, monsterFighter, monsterAi)
+				monster = entities.NewTroll(x, y)
 			}
-			*entities = append(*entities, monster)
+			*ents = append(*ents, monster)
 		}
 	}
 }

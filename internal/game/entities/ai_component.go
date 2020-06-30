@@ -1,4 +1,6 @@
-package game
+package entities
+
+import "github.com/kotojo/roguelike_go/internal/game/state"
 
 type BasicMonster struct {
 	Owner *Entity
@@ -10,8 +12,8 @@ type Map interface {
 	Cost(x, y, xx, yy int) int
 }
 
-func (b *BasicMonster) TakeTurn(target *Entity, gameMap Map) []*ActionResult {
-	var results []*ActionResult
+func (b *BasicMonster) TakeTurn(target *Entity, gameMap Map) []*state.ActionResult {
+	var results []*state.ActionResult
 	monster := b.Owner
 	if gameMap.MapIsInFov(monster.X, monster.Y) {
 		if monster.DistanceTo(target) >= 2 {

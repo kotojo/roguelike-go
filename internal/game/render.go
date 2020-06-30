@@ -5,9 +5,10 @@ import (
 	"sort"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
+	"github.com/kotojo/roguelike_go/internal/game/entities"
 )
 
-func renderAll(font rl.Font, entities []*Entity, player *Entity, gameMap *GameMap, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight int32) {
+func renderAll(font rl.Font, entities []*entities.Entity, player *entities.Entity, gameMap *GameMap, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight int32) {
 	for y := 0; y < gameMap.Height; y++ {
 		for x := 0; x < gameMap.Width; x++ {
 			tile := gameMap.Tiles[x][y]
@@ -51,7 +52,7 @@ func renderAll(font rl.Font, entities []*Entity, player *Entity, gameMap *GameMa
 	renderBar(font, panelX, panelY, panelWidth, panelHeight, "HP", player.Fighter.Hp, player.Fighter.MaxHp, rl.Red, rl.Maroon)
 }
 
-func drawEntity(font rl.Font, entity *Entity, gameMap *GameMap) {
+func drawEntity(font rl.Font, entity *entities.Entity, gameMap *GameMap) {
 	if gameMap.MapIsInFov(entity.X, entity.Y) {
 		rec := rl.Rectangle{
 			X:      float32(entity.X) * BlockSize,
