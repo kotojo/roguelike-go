@@ -1,8 +1,6 @@
 package game
 
 import (
-	"fmt"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/kotojo/roguelike_go/internal/game/entities"
 	"github.com/kotojo/roguelike_go/internal/game/state"
@@ -21,6 +19,18 @@ func StartGame() {
 	mapHeight := 43
 	panelX := (screenWidth / 2) - (panelWidth / 2)
 	panelY := int32(mapHeight) * BlockSize
+
+	messageX := 1
+	// 32 came from trial and error with text spacing while
+	// not hitting the healthbar
+	messageWidth := 32
+	messageHeight := (int(screenHeight/BlockSize) - mapHeight)
+	messageLog := state.MessageLog{
+		X:        messageX,
+		Width:    messageWidth,
+		Height:   messageHeight,
+		Messages: []state.Message{},
+	}
 
 	roomMaxSize := 10
 	roomMinSize := 6
@@ -70,17 +80,17 @@ func StartGame() {
 					playerTurnResults = append(playerTurnResults, attackResults...)
 					for _, playerTurnResult := range playerTurnResults {
 						resultType := playerTurnResult.ResultType
-						if resultType == state.Message {
-							fmt.Println(playerTurnResult.ActionMessage)
+						if resultType == state.ActionResultTypeMessage {
+							messageLog.AddMessage(playerTurnResult.ActionMessage)
 						}
-						if resultType == state.Dead {
-							var message string
+						if resultType == state.ActionResultTypeDead {
+							var message state.Message
 							if player.Fighter.Hp <= 0 {
 								message, gameState = entities.KillPlayer(player)
 							} else {
 								message = entities.KillMonster(target)
 							}
-							fmt.Println(message)
+							messageLog.AddMessage(message)
 						}
 					}
 				} else {
@@ -106,17 +116,17 @@ func StartGame() {
 					enemyTurnResults := enemy.Ai.TakeTurn(player, gameMap)
 					for _, enemyTurnResult := range enemyTurnResults {
 						resultType := enemyTurnResult.ResultType
-						if resultType == state.Message {
-							fmt.Println(enemyTurnResult.ActionMessage)
+						if resultType == state.ActionResultTypeMessage {
+							messageLog.AddMessage(enemyTurnResult.ActionMessage)
 						}
-						if resultType == state.Dead {
-							var message string
+						if resultType == state.ActionResultTypeDead {
+							var message state.Message
 							if player.Fighter.Hp <= 0 {
 								message, gameState = entities.KillPlayer(player)
 							} else {
 								message = entities.KillMonster(enemy)
 							}
-							fmt.Println(message)
+							messageLog.AddMessage(message)
 						}
 					}
 				}
@@ -131,7 +141,7 @@ func StartGame() {
 
 		rl.ClearBackground(rl.RayWhite)
 
-		renderAll(dejaVuFont, ents, player, gameMap, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight)
+		renderAll(dejaVuFont, ents, player, gameMap, messageLog, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight)
 		fovRecompute = false
 
 		rl.EndDrawing()

@@ -7,14 +7,14 @@ import (
 	"github.com/kotojo/roguelike_go/internal/game/state"
 )
 
-func KillPlayer(player *Entity) (string, state.GameState) {
+func KillPlayer(player *Entity) (state.Message, state.GameState) {
 	player.Char = "%"
 	player.Color = rl.Red
 
-	return "You died!", state.PlayerDead
+	return state.Message{Text: "You died!", Color: rl.Red}, state.PlayerDead
 }
 
-func KillMonster(monster *Entity) string {
+func KillMonster(monster *Entity) state.Message {
 	deathMessage := fmt.Sprintf("%s is dead!", monster.Name)
 	monster.Char = "%"
 	monster.Color = rl.Red
@@ -24,5 +24,5 @@ func KillMonster(monster *Entity) string {
 	monster.Name = "remains of " + monster.Name
 	monster.RenderOrder = RenderOrderCorpse
 
-	return deathMessage
+	return state.Message{Text: deathMessage, Color: rl.Red}
 }

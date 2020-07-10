@@ -3,6 +3,7 @@ package entities
 import (
 	"fmt"
 
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/kotojo/roguelike_go/internal/game/state"
 )
 
@@ -19,7 +20,7 @@ func (f *Fighter) TakeDamage(amount int) []*state.ActionResult {
 	f.Hp -= amount
 	if f.Hp <= 0 {
 		fightResult = append(fightResult, &state.ActionResult{
-			ResultType: state.Dead,
+			ResultType: state.ActionResultTypeDead,
 		})
 	}
 	return fightResult
@@ -31,14 +32,14 @@ func (f *Fighter) Attack(target *Entity) []*state.ActionResult {
 	if damage > 0 {
 		damageResult := target.Fighter.TakeDamage(damage)
 		fightResult = append(fightResult, &state.ActionResult{
-			ResultType:    state.Message,
-			ActionMessage: fmt.Sprintf("%s attacks %s for %d hit points.", f.Owner.Name, target.Name, damage),
+			ResultType:    state.ActionResultTypeMessage,
+			ActionMessage: state.Message{Text: fmt.Sprintf("%s attacks %s for %d hit points.", f.Owner.Name, target.Name, damage), Color: rl.Black},
 		})
 		fightResult = append(fightResult, damageResult...)
 	} else {
 		fightResult = append(fightResult, &state.ActionResult{
-			ResultType:    state.Message,
-			ActionMessage: fmt.Sprintf("%s attacks %s but does no damage.", f.Owner.Name, target.Name),
+			ResultType:    state.ActionResultTypeMessage,
+			ActionMessage: state.Message{Text: fmt.Sprintf("%s attacks %s but does no damage.", f.Owner.Name, target.Name), Color: rl.Black},
 		})
 	}
 	return fightResult

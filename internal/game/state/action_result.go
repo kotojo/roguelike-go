@@ -3,11 +3,11 @@ package state
 type ActionResultType int
 
 const (
-	Message ActionResultType = iota + 1
-	Dead
+	ActionResultTypeMessage ActionResultType = iota + 1
+	ActionResultTypeDead
 )
 
 type ActionResult struct {
 	ResultType    ActionResultType
-	ActionMessage string
+	ActionMessage Message
 }

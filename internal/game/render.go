@@ -6,9 +6,10 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/kotojo/roguelike_go/internal/game/entities"
+	"github.com/kotojo/roguelike_go/internal/game/state"
 )
 
-func renderAll(font rl.Font, entities []*entities.Entity, player *entities.Entity, gameMap *GameMap, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight int32) {
+func renderAll(font rl.Font, entities []*entities.Entity, player *entities.Entity, gameMap *GameMap, messageLog state.MessageLog, screenWidth, screenHeight, panelX, panelY, panelWidth, panelHeight int32) {
 	for y := 0; y < gameMap.Height; y++ {
 		for x := 0; x < gameMap.Width; x++ {
 			tile := gameMap.Tiles[x][y]
@@ -50,6 +51,7 @@ func renderAll(font rl.Font, entities []*entities.Entity, player *entities.Entit
 		drawEntity(font, entity, gameMap)
 	}
 	renderBar(font, panelX, panelY, panelWidth, panelHeight, "HP", player.Fighter.Hp, player.Fighter.MaxHp, rl.Red, rl.Maroon)
+	renderMessages(font, messageLog, float32(panelY))
 }
 
 func drawEntity(font rl.Font, entity *entities.Entity, gameMap *GameMap) {
@@ -86,4 +88,15 @@ func renderBar(font rl.Font, x, y, width, height int32, name string, value, maxi
 		Y: float32(y) + (float32(height) / 4),
 	}
 	rl.DrawTextEx(font, text, textPos, textHeight, 0, rl.White)
+}
+
+func renderMessages(font rl.Font, messageLog state.MessageLog, startingY float32) {
+	y := startingY
+	for _, message := range messageLog.Messages {
+		rl.DrawTextEx(font, message.Text, rl.Vector2{
+			X: float32(messageLog.X),
+			Y: y,
+		}, BlockSize, 3, message.Color)
+		y += BlockSize
+	}
 }
